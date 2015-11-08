@@ -8,7 +8,7 @@ x_star = [
 [2],
 [0.1*M + 0.01*N]]
 
-matrixA = [
+set_of_equations = [
 [1.2345, 3.1415, 1,           7.5175 + A],
 [2.3456, 5.9690, 0,           14.2836],
 [3.4567, 2.1828, 2 + 0.1 * N, 7.8223 + B]
@@ -43,24 +43,26 @@ def matrixmult (A, B):
     for i in range(rows_A):
         for j in range(cols_B):
             for k in range(cols_A):
-                C[i][j] += (A[i][k] * B[k][j])
+                C[i][j] += round(A[i][k] * B[k][j], ACCURACY_AFTER_DOT)
     return C
 
 def calculate_cell_by_gauss(i, j, matrix_a, matrix_b, matrix_c):
     sum = 0
 		
     for k in range(0, i):
-        sum += matrix_b[i][k] * matrix_c[k][j]
+        sum += round(matrix_b[i][k] * matrix_c[k][j], ACCURACY_AFTER_DOT)
     
     for k in range(i + 1, len(matrix_b[1])):
-        sum += matrix_b[i][k] * matrix_c[k][j]
+        sum += round(matrix_b[i][k] * matrix_c[k][j], ACCURACY_AFTER_DOT)
     
-    
+    #print(i, j)
+    #print_matrix(matrix_b)
+    #print()
     if (j > i): # this element is in C
-        matrix_c[i][j] = (matrix_a[i][j] - sum)/matrix_b[i][i]
+        matrix_c[i][j] = round((matrix_a[i][j] - sum)/matrix_b[i][i], ACCURACY_AFTER_DOT)
 	
     else: # element in B			
-        matrix_b[i][j] = (matrix_a[i][j] - sum)/matrix_c[i][i]
+        matrix_b[i][j] = round((matrix_a[i][j] - sum)/matrix_c[i][i], ACCURACY_AFTER_DOT)
 		        
                
 def calculate_matrix_B_nad_C_by_gauss(matrix_a):
@@ -96,19 +98,18 @@ def solve_up_triangle_system(matrix, b_column):
     for i in range(len(b_column))[::-1]:
         sum = 0
         for k in range(i):
-            sum += matrix[i][k] * x_column[k][0]
+            sum += round(matrix[i][k] * x_column[k][0], ACCURACY_AFTER_DOT)
         
         for k in range(i+1, len(b_column)):
-            sum += matrix[i][k] * x_column[k][0]
+            sum += round(matrix[i][k] * x_column[k][0], ACCURACY_AFTER_DOT)
         
-        x_column[i][0] = b_column[i][0]/matrix[i][i] - sum
-        print(x_column[i][0])
+        x_column[i][0] = round(b_column[i][0]/matrix[i][i] - sum, ACCURACY_AFTER_DOT)
         
     return x_column
         
     
-def compact_gauss_scheme(matrix_a):
-    matrix_b, matrix_c = calculate_matrix_B_nad_C_by_gauss(matrix_a)
+def compact_gauss_scheme(set_of_equations):
+    matrix_b, matrix_c = calculate_matrix_B_nad_C_by_gauss(set_of_equations)
 	
     y_column = []
     for i in range(0, len(matrix_c)):
@@ -119,17 +120,17 @@ def compact_gauss_scheme(matrix_a):
     
     x_by_method = solve_up_triangle_system(matrix_c, y_column)
 	
-    print("Matrix B:")
-    print_matrix(matrix_b)
-    print()
-    
-    print("Matrix C:")
-    print_matrix(matrix_c)
-    print()
-    
-    print("column y:")
-    print_matrix(y_column)
-    print()
+    #print("Matrix B:")
+    #print_matrix(matrix_b)
+    #print()
+    #
+    #print("Matrix C:")
+    #print_matrix(matrix_c)
+    #print()
+    #
+    #print("column y:")
+    #print_matrix(y_column)
+    #print()
     
     return x_by_method
  
@@ -138,15 +139,29 @@ print("real answer(X*):")
 print_matrix(x_star)
 print()
 
- 
-x_by_method = compact_gauss_scheme(matrixA)
 
 
-
-
-print("method answer:")
-print_matrix(x_by_method)
-print()
+for accuracy in [2, 4, 6]:
+    ACCURACY_AFTER_DOT = accuracy
+    
+    copy_of_system = []
+    
+    for i in range(len(set_of_equations)):
+        copy_of_system.append([])
+        for j in range(len(set_of_equations[i])):
+            copy_of_system[i].append(round(set_of_equations[i][j], ACCURACY_AFTER_DOT))
+    
+    print("accuracy: ", accuracy)
+    
+    try:
+        x_by_method = compact_gauss_scheme(copy_of_system)
+    except ZeroDivisionError:
+        print("accuracy {0} is not enough\n\n".format(accuracy))
+        continue
+    
+    print("answer:")
+    print_matrix(x_by_method)
+    print()
 	
 	
 
