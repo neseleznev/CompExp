@@ -19,6 +19,22 @@ ACCURACY_AFTER_DOT = 0
 def round(value, accuracy):
     return int((value * (10 ** accuracy))) / (10 ** accuracy)
 
+def num_of_non_zero_elements(list):
+    num = 0
+    for i in range(len(list)):
+        if abs(list[i]) > 0:
+            num += 1
+            
+    return num
+
+def get_indexes_of_no_zero_items(list):
+    indexes = []
+    for i in range(len(list)):
+        if abs(list[i]) > 0:
+            indexes.append(i)
+    return indexes
+    
+    
 def print_matrix(matrix):
     s = [[str(e) for e in row] for row in matrix]
     lens = [max(map(len, col)) for col in zip(*s)]
@@ -133,38 +149,104 @@ def compact_gauss_scheme(set_of_equations):
     #print()
     
     return x_by_method
- 
 
-print("real answer(X*):")
-print_matrix(x_star)
-print()
+def find_max_cell(matrix, start_string_num):
+    max_val = matrix[start_string_num][0]
+    res_i = start_string_num
+    res_j = 0
+    for i in range(start_string_num, len(matrix)):
+        for j in range(0, len(matrix[i])):
+            if abs(matrix[i][j]) > max_val:
+                
+                max_val = matrix[i][j]
+                res_i = i
+                res_j = j
+                
+    return res_i, res_j
+   
+def swap_matrix_lines(matrix, string_num_1, string_num_2):
+    temp = matrix[string_num_1]
+    matrix[string_num_1] = matrix[string_num_2]
+    matrix[string_num_2] = temp
+   
+def main_item_gauss(set_of_equations):
+        for start_string_index in range(len(set_of_equations)):
+            matrix_a = [line[:-1] for line in set_of_equations]
+            
+            main_i, main_j = find_max_cell(matrix_a, start_string_index)
+            swap_matrix_lines(set_of_equations, start_string_index, main_i)
+            
+            for i in range(start_string_index + 1, len(set_of_equations)):
+                multiplicator = -set_of_equations[i][main_j] / set_of_equations[start_string_index][main_j]
+                
+                for j in range(len(set_of_equations[i])):
+                    set_of_equations[i][j] += set_of_equations[start_string_index][j] * multiplicator
+        
+        #set_of_equations = sorted(set_of_equations, key = lambda row: num_of_non_zero_elements(row))
+        
+        print_matrix(set_of_equations)
+        
+        x_column = []
+        for i in range(len(set_of_equations[0]) - 1):
+            x_column.append([0])
+        
+        computed_elements_of_x = []
+        for i in range(len(set_of_equations)):
+            indexes_of_no_zero_items = get_indexes_of_no_zero_items(set_of_equations[i][:-1])
+            
+            print(indexes_of_no_zero_items)
+            j = list(set(indexes_of_no_zero_items) - set(computed_elements_of_x))[0]
+            
+            sum = 0
+            for k in range(0, j):
+                sum += set_of_equations[i][k] * x_column[k][0]
+            
+            for k in range(j + 1, len(set_of_equations) - 1):
+                sum += set_of_equations[i][k] * x_column[k][0]
+                
+            x_column[j][0] = (set_of_equations[i][-1]/set_of_equations[i][j] - sum)
+            
+            computed_elements_of_x.append(j)
+        
+        print_matrix(x_column)
+        
+        
+    
 
-
-
-for accuracy in [2, 4, 6]:
-    ACCURACY_AFTER_DOT = accuracy
     
-    copy_of_system = []
-    
-    for i in range(len(set_of_equations)):
-        copy_of_system.append([])
-        for j in range(len(set_of_equations[i])):
-            copy_of_system[i].append(round(set_of_equations[i][j], ACCURACY_AFTER_DOT))
-    
-    print("accuracy: ", accuracy)
-    
-    try:
-        x_by_method = compact_gauss_scheme(copy_of_system)
-    except ZeroDivisionError:
-        print("accuracy {0} is not enough\n\n".format(accuracy))
-        continue
-    
-    print("answer:")
-    print_matrix(x_by_method)
+def do_first_part_of_lab():
+    print("real answer(X*):")
+    print_matrix(x_star)
     print()
-	
-	
 
+
+
+    for accuracy in [2, 4, 6]:
+        global ACCURACY_AFTER_DOT
+        ACCURACY_AFTER_DOT = accuracy
+        
+        copy_of_system = []
+        
+        for i in range(len(set_of_equations)):
+            copy_of_system.append([])
+            for j in range(len(set_of_equations[i])):
+                copy_of_system[i].append(round(set_of_equations[i][j], ACCURACY_AFTER_DOT))
+        
+        print("accuracy: ", accuracy)
+        
+        try:
+            x_by_method = compact_gauss_scheme(copy_of_system)
+        except ZeroDivisionError:
+            print("accuracy {0} is not enough\n\n".format(accuracy))
+            continue
+        
+        print("answer:")
+        print_matrix(x_by_method)
+        print()
+	
+#do_first_part_of_lab()	
+
+main_item_gauss(set_of_equations)
 	
 	
 	
