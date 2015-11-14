@@ -123,8 +123,9 @@ def solve_any_transformed_system(set_of_equations):
 
     while len(computed_elements_of_x) != len(x_column):
         for equation in set_of_equations:
+            no_zero_elements_in_current_row = get_indexes_of_no_zero_items(equation[:-1])
             new_no_zero_elements = list(
-                get_indexes_of_no_zero_items(equation[:-1]) -
+                no_zero_elements_in_current_row -
                 set(no_zero_indexes_on_last_iteration)
             )
             if len(new_no_zero_elements) != 1:
@@ -143,7 +144,7 @@ def solve_any_transformed_system(set_of_equations):
 
             computed_elements_of_x.append(j)
             num_of_computed_x_on_last_iteartion += 1
-            no_zero_indexes_on_last_iteration = new_no_zero_elements
+            no_zero_indexes_on_last_iteration = no_zero_elements_in_current_row
             break
 
         if (num_of_computed_x_on_last_iteartion ==
