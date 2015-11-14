@@ -245,11 +245,11 @@ def main():
     print("=" * 240)
 
     print("[II]\t\t\tCompact Gauss Scheme: ")
-    do_method_investigation(compact_gauss_scheme, accuracy_list=[2, 4, 6, 200])
+    do_method_investigation(compact_gauss_scheme, accuracy_list=[2, 4, 6])
     print("=" * 240)
 
     print("[III]\t\t\tGauss Scheme with main element: ")
-    do_method_investigation(main_item_gauss, accuracy_list=[2, 4, 6, 200])
+    do_method_investigation(main_item_gauss, accuracy_list=[2, 4, 6])
 
 
 if __name__ == '__main__':
